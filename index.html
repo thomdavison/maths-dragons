@@ -10,21 +10,42 @@
 <body>
   <div class="page-shell">
     <header class="hero">
-      <div class="hero-copy">
-        <h1>🐉 Maths Dragons</h1>
-        <div class="hero-badges">
-          <span class="hero-badge">💰 Earn coins</span>
-          <span class="hero-badge">💎 Build crystal streaks</span>
-          <span class="hero-badge">🥚 Unlock surprise dragons</span>
+      <div class="hero-bar">
+        <div class="hero-brand">
+          <h1>🐉 Maths Dragons</h1>
+        </div>
+
+        <div class="hero-resources">
+          <div class="stat-grid hero-stats">
+            <div class="stat-card">
+              <span class="stat-label">Coins</span>
+              <strong id="coinsValue">0</strong>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Crystals</span>
+              <strong id="crystalsValue">0</strong>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Streak</span>
+              <strong id="streakValue">0</strong>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Collection</span>
+              <strong id="ownedValue">0 / 0</strong>
+            </div>
+          </div>
+
+          <div class="progress-panel hero-progress">
+            <div class="progress-label-row">
+              <span>Next coin hatch</span>
+              <strong id="coinMeterText">20 more coins until your next hatch</strong>
+            </div>
+            <div class="progress-bar">
+              <span id="coinMeterFill" class="progress-fill"></span>
+            </div>
+          </div>
         </div>
       </div>
-
-      <aside class="hero-spotlight">
-        <div class="spotlight-egg">🥚✨</div>
-        <p class="spotlight-label">Hatchery spotlight</p>
-        <h2>New dragons await</h2>
-        <p>Keep practicing and fill the treasure bar to hatch your next creature.</p>
-      </aside>
     </header>
 
     <main class="layout">
@@ -36,34 +57,6 @@
           </div>
         </div>
 
-        <div class="stat-grid">
-          <div class="stat-card">
-            <span class="stat-label">Coins</span>
-            <strong id="coinsValue">0</strong>
-          </div>
-          <div class="stat-card">
-            <span class="stat-label">Crystals</span>
-            <strong id="crystalsValue">0</strong>
-          </div>
-          <div class="stat-card">
-            <span class="stat-label">Streak</span>
-            <strong id="streakValue">0</strong>
-          </div>
-          <div class="stat-card">
-            <span class="stat-label">Collection</span>
-            <strong id="ownedValue">0 / 0</strong>
-          </div>
-        </div>
-
-        <div class="progress-panel">
-          <div class="progress-label-row">
-            <span>Next coin hatch</span>
-            <strong id="coinMeterText">20 more coins until your next hatch</strong>
-          </div>
-          <div class="progress-bar">
-            <span id="coinMeterFill" class="progress-fill"></span>
-          </div>
-        </div>
 
         <div class="controls">
           <label>
