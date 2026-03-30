@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Maths Dragons</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero">
+       <h1>🐉 Maths Dragons</h1>
+      <p class="subtitle">Answer questions, earn shiny rewards, and hatch magical creatures.</p>
+    </header>
+
+    <main class="layout">
+      <section class="panel">
+        <div class="panel-title-row">
+        </div>
+        <div class="stat-grid">
+          <div class="stat-card">
+            <span class="stat-label">Coins</span>
+            <strong id="coinsValue">0</strong>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Crystals</span>
+            <strong id="crystalsValue">0</strong>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Streak</span>
+            <strong id="streakValue">0</strong>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Collection</span>
+            <strong id="ownedValue">0 / 0</strong>
+          </div>
+        </div>
+
+        <div class="controls">
+          <label>
+            Topic
+            <select id="modeSelect">
+              <option value="addition">Addition</option>
+              <option value="subtraction">Subtraction</option>
+              <option value="multiplication">Times Tables</option>
+              <option value="division">Division</option>
+              <option value="mixed" selected>Mixed</option>
+            </select>
+          </label>
+
+          <label>
+            Difficulty
+            <select id="difficultySelect">
+              <option value="easy" selected>Easy</option>
+              <option value="medium">Medium</option>
+              <option value="hard">Hard</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="question-card">
+          <p class="question-label">Current question</p>
+          <div id="questionText" class="question-text">Loading…</div>
+
+          <div class="answer-row">
+            <input id="answerInput" type="number" inputmode="numeric" placeholder="Type your answer" />
+            <button id="checkButton" class="primary-button">Check answer</button>
+          </div>
+
+          <div class="button-row">
+            <button id="newQuestionButton" class="secondary-button">New question</button>
+            <button id="resetButton" class="ghost-button">Reset progress</button>
+          </div>
+
+          <div id="feedbackBox" class="feedback info">Solve a sum to start collecting creatures.</div>
+        </div>
+
+        <div class="tip-box">
+          <h3>How rewards work</h3>
+          <ul>
+            <li>Each correct answer gives <strong>coins</strong>.</li>
+            <li>Every 5-answer streak gives a bonus <strong>crystal</strong>.</li>
+            <li>Use either currency to hatch a random creature.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title-row">
+          <h2>Dragon Hatchery</h2>
+          <span class="pill accent">Random unlocks</span>
+        </div>
+
+        <div class="hatchery-box">
+          <p>Spend rewards to hatch a surprise creature from your collection.</p>
+          <div class="button-row hatch-buttons">
+            <button id="coinHatchButton" class="primary-button">Hatch for 20 coins</button>
+            <button id="crystalHatchButton" class="secondary-button">Hatch for 3 crystals</button>
+          </div>
+          <p id="hatchMessage" class="hatch-message">Your starter dragon is waiting for friends.</p>
+        </div>
+
+        <h3 class="collection-heading">Creature Collection</h3>
+        <div id="collectionGrid" class="collection-grid"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="dragons.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
