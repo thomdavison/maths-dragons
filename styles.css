@@ -616,8 +616,66 @@ button:disabled {
   margin-bottom: 8px;
 }
 
+.creature-visual.is-locked {
+  padding: 8px;
+  border-radius: 16px;
+  background: radial-gradient(circle at top, rgba(255, 214, 115, 0.16), rgba(255, 255, 255, 0.02));
+  border: 1px dashed rgba(255, 214, 115, 0.2);
+}
+
+.creature-card[data-rarity="Common"] .creature-visual.is-locked {
+  background: radial-gradient(circle at top, rgba(92, 201, 130, 0.18), rgba(255, 255, 255, 0.02));
+  border-color: rgba(92, 201, 130, 0.26);
+}
+
+.creature-card[data-rarity="Uncommon"] .creature-visual.is-locked {
+  background: radial-gradient(circle at top, rgba(65, 214, 197, 0.18), rgba(255, 255, 255, 0.02));
+  border-color: rgba(65, 214, 197, 0.26);
+}
+
+.creature-card[data-rarity="Rare"] .creature-visual.is-locked {
+  background: radial-gradient(circle at top, rgba(110, 173, 255, 0.2), rgba(255, 255, 255, 0.02));
+  border-color: rgba(110, 173, 255, 0.28);
+}
+
+.creature-card[data-rarity="Epic"] .creature-visual.is-locked {
+  background: radial-gradient(circle at top, rgba(193, 117, 255, 0.2), rgba(255, 255, 255, 0.02));
+  border-color: rgba(193, 117, 255, 0.28);
+}
+
+.creature-card[data-rarity="Legendary"] .creature-visual.is-locked,
+.creature-card[data-rarity="Starter"] .creature-visual.is-locked {
+  background: radial-gradient(circle at top, rgba(255, 204, 99, 0.22), rgba(255, 255, 255, 0.02));
+  border-color: rgba(255, 204, 99, 0.32);
+}
+
 .creature-visual .creature-emoji {
   margin-bottom: 0;
+}
+
+.creature-visual.is-locked .creature-emoji {
+  filter: drop-shadow(0 0 10px rgba(255, 214, 115, 0.32));
+}
+
+.creature-card[data-rarity="Common"] .creature-visual.is-locked .creature-emoji {
+  filter: drop-shadow(0 0 10px rgba(92, 201, 130, 0.34));
+}
+
+.creature-card[data-rarity="Uncommon"] .creature-visual.is-locked .creature-emoji {
+  filter: drop-shadow(0 0 10px rgba(65, 214, 197, 0.34));
+}
+
+.creature-card[data-rarity="Rare"] .creature-visual.is-locked .creature-emoji {
+  filter: drop-shadow(0 0 10px rgba(110, 173, 255, 0.38));
+}
+
+.creature-card[data-rarity="Epic"] .creature-visual.is-locked .creature-emoji {
+  filter: drop-shadow(0 0 10px rgba(193, 117, 255, 0.4));
+}
+
+.creature-card[data-rarity="Legendary"] .creature-visual.is-locked .creature-emoji,
+.creature-card[data-rarity="Starter"] .creature-visual.is-locked .creature-emoji {
+  filter: drop-shadow(0 0 12px rgba(255, 204, 99, 0.42));
 }
 
 .creature-visual.has-image .creature-emoji.is-fallback {
@@ -647,8 +705,23 @@ button:disabled {
 }
 
 .creature-card.locked {
-  opacity: 0.76;
-  background: linear-gradient(180deg, rgba(174, 180, 214, 0.12), rgba(120, 125, 163, 0.06));
+  position: relative;
+  overflow: hidden;
+  border-style: dashed;
+}
+
+.creature-card.locked::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(10, 14, 36, 0.14), rgba(10, 14, 36, 0.24));
+  pointer-events: none;
+}
+
+.creature-card.locked > * {
+  position: relative;
+  z-index: 1;
 }
 
 .hatch-message.sparkle {
@@ -714,6 +787,7 @@ button:disabled {
   justify-content: center;
   padding: 4px 8px;
   border-radius: 999px;
+  border: 1px solid transparent;
   background: rgba(123, 140, 255, 0.14);
   font-size: 0.76rem;
   font-weight: 800;
@@ -721,19 +795,80 @@ button:disabled {
   margin-bottom: 8px;
 }
 
-.creature-card[data-rarity="Legendary"] .creature-rarity {
-  background: rgba(255, 204, 99, 0.18);
-  color: #ffe7a5;
+.creature-card[data-rarity="Starter"] .creature-rarity {
+  background: rgba(255, 181, 75, 0.2);
+  border-color: rgba(255, 181, 75, 0.28);
+  color: #ffe8b8;
 }
 
-.creature-card[data-rarity="Epic"] .creature-rarity {
-  background: rgba(193, 117, 255, 0.18);
-  color: #f2ddff;
+.creature-card[data-rarity="Common"] .creature-rarity {
+  background: rgba(92, 201, 130, 0.18);
+  border-color: rgba(92, 201, 130, 0.24);
+  color: #dbffe7;
+}
+
+.creature-card[data-rarity="Uncommon"] .creature-rarity {
+  background: rgba(65, 214, 197, 0.18);
+  border-color: rgba(65, 214, 197, 0.24);
+  color: #dcfffb;
 }
 
 .creature-card[data-rarity="Rare"] .creature-rarity {
-  background: rgba(110, 173, 255, 0.18);
+  background: rgba(110, 173, 255, 0.2);
+  border-color: rgba(110, 173, 255, 0.26);
   color: #def0ff;
+}
+
+.creature-card[data-rarity="Epic"] .creature-rarity {
+  background: rgba(193, 117, 255, 0.2);
+  border-color: rgba(193, 117, 255, 0.26);
+  color: #f2ddff;
+}
+
+.creature-card[data-rarity="Legendary"] .creature-rarity {
+  background: rgba(255, 204, 99, 0.22);
+  border-color: rgba(255, 204, 99, 0.3);
+  color: #ffe7a5;
+}
+
+.creature-card.locked .creature-rarity {
+  opacity: 0.98;
+}
+
+.creature-card.locked[data-rarity="Starter"] .creature-rarity {
+  background: rgba(255, 181, 75, 0.2);
+  border-color: rgba(255, 181, 75, 0.28);
+  color: #ffe8b8;
+}
+
+.creature-card.locked[data-rarity="Common"] .creature-rarity {
+  background: rgba(92, 201, 130, 0.18);
+  border-color: rgba(92, 201, 130, 0.24);
+  color: #dbffe7;
+}
+
+.creature-card.locked[data-rarity="Uncommon"] .creature-rarity {
+  background: rgba(65, 214, 197, 0.18);
+  border-color: rgba(65, 214, 197, 0.24);
+  color: #dcfffb;
+}
+
+.creature-card.locked[data-rarity="Rare"] .creature-rarity {
+  background: rgba(110, 173, 255, 0.2);
+  border-color: rgba(110, 173, 255, 0.26);
+  color: #def0ff;
+}
+
+.creature-card.locked[data-rarity="Epic"] .creature-rarity {
+  background: rgba(193, 117, 255, 0.2);
+  border-color: rgba(193, 117, 255, 0.26);
+  color: #f2ddff;
+}
+
+.creature-card.locked[data-rarity="Legendary"] .creature-rarity {
+  background: rgba(255, 204, 99, 0.22);
+  border-color: rgba(255, 204, 99, 0.3);
+  color: #ffe7a5;
 }
 
 .theme-group.theme-forest .theme-heading {
@@ -756,8 +891,13 @@ button:disabled {
 .theme-group.theme-legendary .theme-heading {
   color: #fff0c2;
 }
-.creature-card.locked .creature-rarity {
-  color: var(--muted);
+
+.creature-card.locked .creature-name {
+  color: #eef3ff;
+}
+
+.creature-card.locked .creature-blurb {
+  color: #c4cfee;
 }
 
 .creature-blurb {
