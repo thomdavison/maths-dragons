@@ -31,6 +31,7 @@ const DEFAULT_STATE = {
 const state = loadState();
 let currentQuestion = null;
 let nextQuestionTimer = null;
+let questionLocked = false;
 
 const elements = {
   coinsValue: document.getElementById("coinsValue"),
@@ -97,14 +98,7 @@ function weightedRandom(items) {
 }
 
 const TIMES_TABLES = [2, 3, 4, 5, 8, 10];
-const THEME_ORDER = [
-  "Starter",
-  "Forest",
-  "Water",
-  "Sky",
-  "Magic",
-  "Legendary",
-];
+const THEME_ORDER = ["Starter", "Forest", "Water", "Sky", "Magic", "Legendary"];
 const THEME_ICONS = {
   Starter: "🔥",
   Forest: "🌿",
@@ -113,6 +107,7 @@ const THEME_ICONS = {
   Magic: "✨",
   Legendary: "👑",
 };
+const IMAGE_EXTENSIONS = ["png", "jpg", "jpeg", "webp", "gif", "svg"];
 
 function makeQuestion(mode, difficulty) {
   const config = {
@@ -180,8 +175,8 @@ function showFeedback(message, type = "info") {
 }
 
 function updateStats() {
-  elements.coinsValue.textContent = state.coins;
-  elements.crystalsValue.textContent = state.crystals;
+  elements.coinsValue.textContent = `${state.coins} 💰`;
+  elements.crystalsValue.textContent = `${state.crystals} 💎`;
   elements.streakValue.textContent = `${state.streak} 🔥`;
   elements.ownedValue.textContent = `${state.unlockedIds.length} / ${window.DRAGONS.length}`;
 
@@ -197,6 +192,55 @@ function updateStats() {
   }
 }
 
+function getDragonVisualMarkup(dragon, unlocked) {
+  return `
+    <div class="creature-visual ${unlocked ? "" : "is-locked"}">
+      <img class="creature-image" data-dragon-id="${dragon.id}" alt="${dragon.name}" loading="lazy" />
+      <span class="creature-emoji is-fallback">${unlocked ? dragon.emoji : "❔"}</span>
+    </div>
+  `;
+}
+
+function tryLoadDragonImage(image) {
+  const extIndex = Number(image.dataset.extIndex || 0);
+  if (extIndex >= IMAGE_EXTENSIONS.length) {
+    image.removeAttribute("src");
+    return;
+  }
+
+  image.src = `images/${image.dataset.dragonId}.${IMAGE_EXTENSIONS[extIndex]}`;
+}
+
+function handleDragonImageLoad(event) {
+  const image = event.currentTarget;
+  image.classList.add("is-visible");
+  image.closest(".creature-visual")?.classList.add("has-image");
+}
+
+function handleDragonImageError(event) {
+  const image = event.currentTarget;
+  const nextIndex = Number(image.dataset.extIndex || 0) + 1;
+  image.dataset.extIndex = String(nextIndex);
+
+  if (nextIndex >= IMAGE_EXTENSIONS.length) {
+    image.removeAttribute("src");
+    return;
+  }
+
+  tryLoadDragonImage(image);
+}
+
+function hydrateDragonImages() {
+  const images = elements.collectionGrid.querySelectorAll(".creature-image");
+
+  images.forEach((image) => {
+    image.dataset.extIndex = "0";
+    image.addEventListener("load", handleDragonImageLoad);
+    image.addEventListener("error", handleDragonImageError);
+    tryLoadDragonImage(image);
+  });
+}
+
 function renderCollection() {
   const groups = window.DRAGONS.reduce((map, dragon) => {
     const theme = dragon.theme || "Magic";
@@ -209,17 +253,19 @@ function renderCollection() {
 
   const sections = THEME_ORDER.filter((theme) => groups[theme]?.length)
     .map((theme) => {
-      const cards = groups[theme].map((dragon) => {
-        const unlocked = state.unlockedIds.includes(dragon.id);
-        return `
+      const cards = groups[theme]
+        .map((dragon) => {
+          const unlocked = state.unlockedIds.includes(dragon.id);
+          return `
           <article class="creature-card ${unlocked ? "" : "locked"}" data-dragon-id="${dragon.id}">
-            <span class="creature-emoji">${unlocked ? dragon.emoji : "❔"}</span>
+            ${getDragonVisualMarkup(dragon, unlocked)}
             <div class="creature-name">${unlocked ? dragon.name : "Mystery Egg"}</div>
             <div class="creature-rarity">${unlocked ? dragon.rarity : "Locked"}</div>
             <p class="creature-blurb">${unlocked ? dragon.blurb : "Keep answering questions to hatch this creature."}</p>
           </article>
         `;
-      }).join("");
+        })
+        .join("");
 
       return `
         <section class="theme-group">
@@ -231,6 +277,7 @@ function renderCollection() {
     .join("");
 
   elements.collectionGrid.innerHTML = sections;
+  hydrateDragonImages();
 }
 
 function playHatchAnimation(dragonId) {
@@ -258,18 +305,27 @@ function playHatchAnimation(dragonId) {
   }, 1200);
 }
 
+function setQuestionLocked(isLocked) {
+  questionLocked = isLocked;
+  elements.answerInput.disabled = isLocked;
+  elements.checkButton.disabled = isLocked;
+}
+
 function generateQuestion() {
   clearTimeout(nextQuestionTimer);
   currentQuestion = makeQuestion(
     elements.modeSelect.value,
     elements.difficultySelect.value,
   );
+  setQuestionLocked(false);
   elements.questionText.textContent = currentQuestion.text;
   elements.answerInput.value = "";
   elements.answerInput.focus();
 }
 
 function awardCorrectAnswer() {
+  setQuestionLocked(true);
+  currentQuestion = null;
   const coinsByDifficulty = {
     easy: 1,
     medium: 2,
@@ -301,17 +357,25 @@ function awardCorrectAnswer() {
 }
 
 function handleWrongAnswer() {
+  const correctAnswer = currentQuestion.answer;
+  setQuestionLocked(true);
+  currentQuestion = null;
   state.solved += 1;
   state.streak = 0;
   saveState();
   updateStats();
   showFeedback(
-    `Not quite — the answer was ${currentQuestion.answer}. ${pickRandom(ENCOURAGEMENT_LINES)}`,
+    `Not quite — the answer was ${correctAnswer}. ${pickRandom(ENCOURAGEMENT_LINES)}`,
     "error",
   );
+  nextQuestionTimer = setTimeout(generateQuestion, 1400);
 }
 
 function checkAnswer() {
+  if (questionLocked) {
+    return;
+  }
+
   if (!currentQuestion) {
     generateQuestion();
     return;

@@ -310,6 +310,36 @@ button:disabled {
   text-align: center;
 }
 
+.creature-visual {
+  min-height: 60px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 8px;
+}
+
+.creature-visual .creature-emoji {
+  margin-bottom: 0;
+}
+
+.creature-visual.has-image .creature-emoji.is-fallback {
+  display: none;
+}
+
+.creature-visual.is-locked.has-image .creature-image {
+  opacity: 0.8;
+}
+
+.creature-image {
+  display: none;
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+
+.creature-image.is-visible {
+  display: block;
+}
+
 .creature-card.just-hatched {
   animation: hatch-pop 1.2s ease;
   border-color: #ffb84d;
