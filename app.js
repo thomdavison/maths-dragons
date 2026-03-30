@@ -346,7 +346,7 @@ function awardCorrectAnswer() {
   const coinsByDifficulty = {
     easy: 1,
     medium: 2,
-    hard: 300,
+    hard: 3,
   };
 
   const coinsEarned = coinsByDifficulty[elements.difficultySelect.value];
