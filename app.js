@@ -38,6 +38,8 @@ const elements = {
   crystalsValue: document.getElementById("crystalsValue"),
   streakValue: document.getElementById("streakValue"),
   ownedValue: document.getElementById("ownedValue"),
+  coinMeterFill: document.getElementById("coinMeterFill"),
+  coinMeterText: document.getElementById("coinMeterText"),
   modeSelect: document.getElementById("modeSelect"),
   difficultySelect: document.getElementById("difficultySelect"),
   questionText: document.getElementById("questionText"),
@@ -180,6 +182,20 @@ function updateStats() {
   elements.streakValue.textContent = `${state.streak} 🔥`;
   elements.ownedValue.textContent = `${state.unlockedIds.length} / ${window.DRAGONS.length}`;
 
+  const coinProgress = Math.min((state.coins / HATCH_COST.coins) * 100, 100);
+  const coinsNeeded = Math.max(HATCH_COST.coins - state.coins, 0);
+
+  if (elements.coinMeterFill) {
+    elements.coinMeterFill.style.width = `${coinProgress}%`;
+  }
+
+  if (elements.coinMeterText) {
+    elements.coinMeterText.textContent =
+      coinsNeeded === 0
+        ? "Your coin hatch is ready — choose a mystery egg!"
+        : `${coinsNeeded} more coin${coinsNeeded === 1 ? "" : "s"} until your next hatch`;
+  }
+
   const allUnlocked = state.unlockedIds.length === window.DRAGONS.length;
   elements.coinHatchButton.disabled =
     allUnlocked || state.coins < HATCH_COST.coins;
@@ -195,8 +211,8 @@ function updateStats() {
 function getDragonVisualMarkup(dragon, unlocked) {
   return `
     <div class="creature-visual ${unlocked ? "" : "is-locked"}">
-      <img class="creature-image" data-dragon-id="${dragon.id}" alt="${dragon.name}" loading="lazy" />
-      <span class="creature-emoji is-fallback">${unlocked ? dragon.emoji : "❔"}</span>
+      <img class="creature-image" data-dragon-id="${dragon.id}" alt="${dragon.name}" loading="eager" decoding="async" />
+      <span class="creature-emoji is-fallback">${unlocked ? dragon.emoji : "🥚"}</span>
     </div>
   `;
 }
@@ -208,7 +224,8 @@ function tryLoadDragonImage(image) {
     return;
   }
 
-  image.src = `images/${image.dataset.dragonId}.${IMAGE_EXTENSIONS[extIndex]}`;
+  const fileName = `${image.dataset.dragonId}.${IMAGE_EXTENSIONS[extIndex]}`;
+  image.src = new URL(`./images/${fileName}`, document.baseURI).href;
 }
 
 function handleDragonImageLoad(event) {
@@ -257,7 +274,7 @@ function renderCollection() {
         .map((dragon) => {
           const unlocked = state.unlockedIds.includes(dragon.id);
           return `
-          <article class="creature-card ${unlocked ? "" : "locked"}" data-dragon-id="${dragon.id}">
+          <article class="creature-card ${unlocked ? "" : "locked"}" data-dragon-id="${dragon.id}" data-rarity="${dragon.rarity}" data-theme="${theme.toLowerCase()}">
             ${getDragonVisualMarkup(dragon, unlocked)}
             <div class="creature-name">${unlocked ? dragon.name : "Mystery Egg"}</div>
             <div class="creature-rarity">${unlocked ? dragon.rarity : "Locked"}</div>
@@ -268,7 +285,7 @@ function renderCollection() {
         .join("");
 
       return `
-        <section class="theme-group">
+        <section class="theme-group theme-${theme.toLowerCase()}" data-theme="${theme.toLowerCase()}">
           <h4 class="theme-heading">${THEME_ICONS[theme] || "🐉"} ${theme}</h4>
           <div class="theme-grid">${cards}</div>
         </section>

@@ -3,20 +3,39 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <base href="./" />
   <title>Maths Dragons</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="page-shell">
     <header class="hero">
-       <h1>🐉 Maths Dragons</h1>
-      <p class="subtitle">Answer questions, earn shiny rewards, and hatch magical creatures.</p>
+      <div class="hero-copy">
+        <h1>🐉 Maths Dragons</h1>
+        <div class="hero-badges">
+          <span class="hero-badge">💰 Earn coins</span>
+          <span class="hero-badge">💎 Build crystal streaks</span>
+          <span class="hero-badge">🥚 Unlock surprise dragons</span>
+        </div>
+      </div>
+
+      <aside class="hero-spotlight">
+        <div class="spotlight-egg">🥚✨</div>
+        <p class="spotlight-label">Hatchery spotlight</p>
+        <h2>New dragons await</h2>
+        <p>Keep practicing and fill the treasure bar to hatch your next creature.</p>
+      </aside>
     </header>
 
     <main class="layout">
-      <section class="panel">
+      <section class="panel practice-panel">
         <div class="panel-title-row">
+          <div>
+            <p class="section-kicker">Arena</p>
+            <h2>Train your dragon brain</h2>
+          </div>
         </div>
+
         <div class="stat-grid">
           <div class="stat-card">
             <span class="stat-label">Coins</span>
@@ -33,6 +52,16 @@
           <div class="stat-card">
             <span class="stat-label">Collection</span>
             <strong id="ownedValue">0 / 0</strong>
+          </div>
+        </div>
+
+        <div class="progress-panel">
+          <div class="progress-label-row">
+            <span>Next coin hatch</span>
+            <strong id="coinMeterText">20 more coins until your next hatch</strong>
+          </div>
+          <div class="progress-bar">
+            <span id="coinMeterFill" class="progress-fill"></span>
           </div>
         </div>
 
@@ -85,21 +114,33 @@
         </div>
       </section>
 
-      <section class="panel">
+      <section class="panel hatchery-panel">
         <div class="panel-title-row">
-          <h2>Dragon Hatchery</h2>
+          <div>
+            <p class="section-kicker">Dragon Hatchery</p>
+            <h2>Unlock a surprise friend</h2>
+          </div>
         </div>
 
         <div class="hatchery-box">
-          <p>Spend rewards to hatch a surprise creature from your collection.</p>
+          <div class="hatchery-spotlight">
+            <div class="spotlight-egg small">🐣</div>
+            <div>
+              <p class="spotlight-label">Mystery egg</p>
+              <p id="hatchMessage" class="hatch-message">Your starter dragon is waiting for friends.</p>
+            </div>
+          </div>
+
+          <p class="hatchery-text">Spend your rewards to hatch a surprise creature from your collection.</p>
+
           <div class="button-row hatch-buttons">
             <button id="coinHatchButton" class="primary-button">Hatch for 20 coins</button>
             <button id="crystalHatchButton" class="secondary-button">Hatch for 3 crystals</button>
           </div>
-          <p id="hatchMessage" class="hatch-message">Your starter dragon is waiting for friends.</p>
         </div>
 
         <h3 class="collection-heading">Creature Collection</h3>
+        <p class="collection-subtitle">Explore forest, water, sky, magic, and legendary dragons.</p>
         <div id="collectionGrid" class="collection-grid"></div>
       </section>
     </main>
