@@ -1,4 +1,4 @@
-const STORAGE_KEY = "maths-dragons-save-v1";
+const STORAGE_KEY = "maths-beasts-save-v1";
 const HATCH_COST = {
   coins: 20,
   crystals: 3,
@@ -8,7 +8,7 @@ const SUCCESS_LINES = [
   "Great job!",
   "You smashed it!",
   "Fantastic maths!",
-  "That was dragon-level clever!",
+  "That was beast-level clever!",
 ];
 
 const ENCOURAGEMENT_LINES = [
@@ -25,7 +25,7 @@ const DEFAULT_STATE = {
   bestStreak: 0,
   solved: 0,
   correct: 0,
-  unlockedIds: ["ember"],
+  unlockedIds: [],
 };
 
 const state = loadState();
@@ -46,12 +46,16 @@ const elements = {
   answerInput: document.getElementById("answerInput"),
   checkButton: document.getElementById("checkButton"),
   newQuestionButton: document.getElementById("newQuestionButton"),
-  resetButton: document.getElementById("resetButton"),
   feedbackBox: document.getElementById("feedbackBox"),
   coinHatchButton: document.getElementById("coinHatchButton"),
   crystalHatchButton: document.getElementById("crystalHatchButton"),
   hatchMessage: document.getElementById("hatchMessage"),
   collectionGrid: document.getElementById("collectionGrid"),
+  collectionEmpty: document.getElementById("collectionEmpty"),
+  collectionSearch: document.getElementById("collectionSearch"),
+  collectionSort: document.getElementById("collectionSort"),
+  tabButtons: document.querySelectorAll(".tab-button"),
+  tabPanels: document.querySelectorAll(".tab-panel"),
 };
 
 function loadState() {
@@ -65,7 +69,7 @@ function loadState() {
       ...DEFAULT_STATE,
       ...saved,
       unlockedIds: Array.isArray(saved.unlockedIds)
-        ? Array.from(new Set(["ember", ...saved.unlockedIds]))
+        ? Array.from(new Set(saved.unlockedIds))
         : [...DEFAULT_STATE.unlockedIds],
     };
   } catch {
@@ -180,23 +184,28 @@ function updateStats() {
   elements.coinsValue.textContent = `${state.coins} 💰`;
   elements.crystalsValue.textContent = `${state.crystals} 💎`;
   elements.streakValue.textContent = `${state.streak} 🔥`;
-  elements.ownedValue.textContent = `${state.unlockedIds.length} / ${window.DRAGONS.length}`;
+  elements.ownedValue.textContent = `${state.unlockedIds.length} / ${window.BEASTS.length}`;
 
   const coinProgress = Math.min((state.coins / HATCH_COST.coins) * 100, 100);
   const coinsNeeded = Math.max(HATCH_COST.coins - state.coins, 0);
+  const allUnlocked = state.unlockedIds.length === window.BEASTS.length;
 
   if (elements.coinMeterFill) {
     elements.coinMeterFill.style.width = `${coinProgress}%`;
   }
 
   if (elements.coinMeterText) {
-    elements.coinMeterText.textContent =
-      coinsNeeded === 0
-        ? "Your coin hatch is ready — choose a mystery egg!"
-        : `${coinsNeeded} more coin${coinsNeeded === 1 ? "" : "s"} until your next hatch`;
+    if (allUnlocked) {
+      elements.coinMeterText.textContent =
+        "Collection complete — every creature is unlocked!";
+    } else {
+      elements.coinMeterText.textContent =
+        coinsNeeded === 0
+          ? `Coin hatch ready — or use ${HATCH_COST.crystals} crystals now`
+          : `${coinsNeeded} more coin${coinsNeeded === 1 ? "" : "s"} for a hatch, or use ${HATCH_COST.crystals} crystals`;
+    }
   }
 
-  const allUnlocked = state.unlockedIds.length === window.DRAGONS.length;
   elements.coinHatchButton.disabled =
     allUnlocked || state.coins < HATCH_COST.coins;
   elements.crystalHatchButton.disabled =
@@ -208,33 +217,33 @@ function updateStats() {
   }
 }
 
-function getDragonVisualMarkup(dragon, unlocked) {
+function getBeastVisualMarkup(beast, unlocked) {
   return `
     <div class="creature-visual ${unlocked ? "" : "is-locked"}">
-      <img class="creature-image" data-dragon-id="${dragon.id}" alt="${dragon.name}" loading="eager" decoding="async" />
-      <span class="creature-emoji is-fallback">${unlocked ? dragon.emoji : "🥚"}</span>
+      <img class="creature-image" data-beast-id="${beast.id}" alt="${beast.name}" loading="eager" decoding="async" />
+      <span class="creature-emoji is-fallback">${unlocked ? beast.emoji : "🥚"}</span>
     </div>
   `;
 }
 
-function tryLoadDragonImage(image) {
+function tryLoadBeastImage(image) {
   const extIndex = Number(image.dataset.extIndex || 0);
   if (extIndex >= IMAGE_EXTENSIONS.length) {
     image.removeAttribute("src");
     return;
   }
 
-  const fileName = `${image.dataset.dragonId}.${IMAGE_EXTENSIONS[extIndex]}`;
+  const fileName = `${image.dataset.beastId}.${IMAGE_EXTENSIONS[extIndex]}`;
   image.src = new URL(`./images/${fileName}`, document.baseURI).href;
 }
 
-function handleDragonImageLoad(event) {
+function handleBeastImageLoad(event) {
   const image = event.currentTarget;
   image.classList.add("is-visible");
   image.closest(".creature-visual")?.classList.add("has-image");
 }
 
-function handleDragonImageError(event) {
+function handleBeastImageError(event) {
   const image = event.currentTarget;
   const nextIndex = Number(image.dataset.extIndex || 0) + 1;
   image.dataset.extIndex = String(nextIndex);
@@ -244,41 +253,119 @@ function handleDragonImageError(event) {
     return;
   }
 
-  tryLoadDragonImage(image);
+  tryLoadBeastImage(image);
 }
 
-function hydrateDragonImages() {
+function hydrateBeastImages() {
   const images = elements.collectionGrid.querySelectorAll(".creature-image");
 
   images.forEach((image) => {
     image.dataset.extIndex = "0";
-    image.addEventListener("load", handleDragonImageLoad);
-    image.addEventListener("error", handleDragonImageError);
-    tryLoadDragonImage(image);
+    image.addEventListener("load", handleBeastImageLoad);
+    image.addEventListener("error", handleBeastImageError);
+    tryLoadBeastImage(image);
   });
 }
 
 function renderCollection() {
-  const groups = window.DRAGONS.reduce((map, dragon) => {
-    const theme = dragon.theme || "Magic";
+  // Get all beasts
+  const allBeasts = window.BEASTS;
+
+  // Separate unlocked and locked beasts
+  const unlockedBeasts = allBeasts.filter((beast) =>
+    state.unlockedIds.includes(beast.id),
+  );
+  const lockedBeasts = allBeasts.filter(
+    (beast) => !state.unlockedIds.includes(beast.id),
+  );
+
+  // Apply search filter only to unlocked beasts
+  const searchTerm = (elements.collectionSearch?.value || "").toLowerCase();
+  const filteredUnlocked = unlockedBeasts.filter((beast) =>
+    beast.name.toLowerCase().includes(searchTerm),
+  );
+
+  // Build unlocked section
+  let unlockedSection = "";
+  if (filteredUnlocked.length > 0) {
+    // Apply sort to unlocked beasts
+    let sortedUnlocked = [...filteredUnlocked];
+    const sortValue = elements.collectionSort?.value || "theme";
+
+    if (sortValue === "name") {
+      sortedUnlocked = sortedUnlocked.sort((a, b) =>
+        a.name.localeCompare(b.name),
+      );
+    } else if (sortValue === "rarity") {
+      const rarityOrder = ["Common", "Uncommon", "Rare", "Epic", "Legendary"];
+      sortedUnlocked = sortedUnlocked.sort(
+        (a, b) =>
+          (rarityOrder.indexOf(a.rarity) || 99) -
+          (rarityOrder.indexOf(b.rarity) || 99),
+      );
+    }
+
+    const unlockedCards = sortedUnlocked
+      .map((beast) => {
+        return `
+        <article class="creature-card" data-beast-id="${beast.id}" data-rarity="${beast.rarity}" data-theme="${(beast.theme || "Magic").toLowerCase()}">
+          ${getBeastVisualMarkup(beast, true)}
+          <div class="creature-name">${beast.name}</div>
+          <div class="creature-rarity">${beast.rarity}</div>
+          <p class="creature-blurb">${beast.blurb}</p>
+        </article>
+      `;
+      })
+      .join("");
+
+    unlockedSection = `
+      <section class="theme-group theme-unlocked" data-theme="unlocked">
+        <h4 class="theme-heading">🎉 Your Beasts</h4>
+        <div class="theme-grid">${unlockedCards}</div>
+      </section>
+    `;
+  }
+
+  // Build locked sections grouped by theme
+  const lockedGroups = lockedBeasts.reduce((map, beast) => {
+    const theme = beast.theme || "Magic";
     if (!map[theme]) {
       map[theme] = [];
     }
-    map[theme].push(dragon);
+    map[theme].push(beast);
     return map;
   }, {});
 
-  const sections = THEME_ORDER.filter((theme) => groups[theme]?.length)
+  const lockedSections = THEME_ORDER.filter(
+    (theme) => lockedGroups[theme]?.length,
+  )
     .map((theme) => {
-      const cards = groups[theme]
-        .map((dragon) => {
-          const unlocked = state.unlockedIds.includes(dragon.id);
+      let beastsInTheme = lockedGroups[theme];
+
+      // Apply sort within the theme
+      const sortValue = elements.collectionSort?.value || "theme";
+
+      if (sortValue === "name") {
+        beastsInTheme = beastsInTheme.sort((a, b) =>
+          a.name.localeCompare(b.name),
+        );
+      } else if (sortValue === "rarity") {
+        const rarityOrder = ["Common", "Uncommon", "Rare", "Epic", "Legendary"];
+        beastsInTheme = beastsInTheme.sort(
+          (a, b) =>
+            (rarityOrder.indexOf(a.rarity) || 99) -
+            (rarityOrder.indexOf(b.rarity) || 99),
+        );
+      }
+
+      const cards = beastsInTheme
+        .map((beast) => {
           return `
-          <article class="creature-card ${unlocked ? "" : "locked"}" data-dragon-id="${dragon.id}" data-rarity="${dragon.rarity}" data-theme="${theme.toLowerCase()}">
-            ${getDragonVisualMarkup(dragon, unlocked)}
-            <div class="creature-name">${unlocked ? dragon.name : "Mystery Egg"}</div>
-            <div class="creature-rarity">${unlocked ? dragon.rarity : "Locked"}</div>
-            <p class="creature-blurb">${unlocked ? dragon.blurb : "Keep answering questions to hatch this creature."}</p>
+          <article class="creature-card locked" data-beast-id="${beast.id}" data-rarity="${beast.rarity}" data-theme="${theme.toLowerCase()}">
+            ${getBeastVisualMarkup(beast, false)}
+            <div class="creature-name">Mystery Egg</div>
+            <div class="creature-rarity">Locked</div>
+            <p class="creature-blurb">Keep answering questions to hatch this creature.</p>
           </article>
         `;
         })
@@ -293,23 +380,25 @@ function renderCollection() {
     })
     .join("");
 
-  elements.collectionGrid.innerHTML = sections;
-  hydrateDragonImages();
+  elements.collectionGrid.innerHTML =
+    unlockedSection + (searchTerm ? "" : lockedSections);
+  elements.collectionEmpty.style.display = "none";
+  hydrateBeastImages();
 }
 
-function playHatchAnimation(dragonId) {
-  const dragonCard = elements.collectionGrid.querySelector(
-    `[data-dragon-id="${dragonId}"]`,
+function playHatchAnimation(beastId) {
+  const beastCard = elements.collectionGrid.querySelector(
+    `[data-beast-id="${beastId}"]`,
   );
 
-  if (dragonCard) {
-    dragonCard.classList.remove("just-hatched");
-    void dragonCard.offsetWidth;
-    dragonCard.classList.add("just-hatched");
-    dragonCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  if (beastCard) {
+    beastCard.classList.remove("just-hatched");
+    void beastCard.offsetWidth;
+    beastCard.classList.add("just-hatched");
+    beastCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
 
     window.setTimeout(() => {
-      dragonCard.classList.remove("just-hatched");
+      beastCard.classList.remove("just-hatched");
     }, 1600);
   }
 
@@ -346,7 +435,7 @@ function awardCorrectAnswer() {
   const coinsByDifficulty = {
     easy: 1,
     medium: 2,
-    hard: 3,
+    hard: 300,
   };
 
   const coinsEarned = coinsByDifficulty[elements.difficultySelect.value];
@@ -413,8 +502,8 @@ function checkAnswer() {
 }
 
 function hatchCreature(currency) {
-  const lockedCreatures = window.DRAGONS.filter(
-    (dragon) => !state.unlockedIds.includes(dragon.id),
+  const lockedCreatures = window.BEASTS.filter(
+    (beast) => !state.unlockedIds.includes(beast.id),
   );
   if (!lockedCreatures.length) {
     elements.hatchMessage.textContent =
@@ -473,10 +562,33 @@ function resetProgress() {
   );
 }
 
+function switchTab(tabName) {
+  // Hide all panels
+  elements.tabPanels.forEach((panel) => {
+    panel.classList.remove("active");
+  });
+
+  // Deactivate all buttons
+  elements.tabButtons.forEach((btn) => {
+    btn.classList.remove("active");
+  });
+
+  // Show selected panel
+  const selectedPanel = document.getElementById(`${tabName}-panel`);
+  if (selectedPanel) {
+    selectedPanel.classList.add("active");
+  }
+
+  // Activate selected button
+  const selectedBtn = document.querySelector(`[data-tab="${tabName}"]`);
+  if (selectedBtn) {
+    selectedBtn.classList.add("active");
+  }
+}
+
 function wireEvents() {
   elements.checkButton.addEventListener("click", checkAnswer);
   elements.newQuestionButton.addEventListener("click", generateQuestion);
-  elements.resetButton.addEventListener("click", resetProgress);
   elements.coinHatchButton.addEventListener("click", () =>
     hatchCreature("coins"),
   );
@@ -490,6 +602,22 @@ function wireEvents() {
       checkAnswer();
     }
   });
+
+  // Tab switching
+  elements.tabButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const tabName = btn.dataset.tab;
+      switchTab(tabName);
+    });
+  });
+
+  // Collection search and sort
+  if (elements.collectionSearch) {
+    elements.collectionSearch.addEventListener("input", renderCollection);
+  }
+  if (elements.collectionSort) {
+    elements.collectionSort.addEventListener("change", renderCollection);
+  }
 }
 
 function init() {
@@ -498,7 +626,7 @@ function init() {
   renderCollection();
   generateQuestion();
   showFeedback(
-    "Welcome to Maths Dragons! Answer correctly to earn rewards.",
+    "Welcome to Maths Beasts! Answer correctly to earn rewards.",
     "info",
   );
 }

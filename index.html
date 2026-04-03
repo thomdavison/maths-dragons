@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <base href="./" />
-  <title>Maths Dragons</title>
+  <title>Maths Beasts</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -12,7 +12,7 @@
     <header class="hero">
       <div class="hero-bar">
         <div class="hero-brand">
-          <h1>🐉 Maths Dragons</h1>
+          <h1>🐉 Maths Beasts</h1>
         </div>
 
         <div class="hero-resources">
@@ -37,109 +37,133 @@
 
           <div class="progress-panel hero-progress">
             <div class="progress-label-row">
-              <span>Next coin hatch</span>
+              <span>Hatchery status</span>
               <strong id="coinMeterText">20 more coins until your next hatch</strong>
             </div>
             <div class="progress-bar">
               <span id="coinMeterFill" class="progress-fill"></span>
+            </div>
+            <div class="hero-hatch-meta">
+              <div class="hero-hatch-buttons">
+                <button id="coinHatchButton" class="primary-button hero-hatch-btn">Hatch for 20 coins</button>
+                <button id="crystalHatchButton" class="secondary-button hero-hatch-btn">Hatch for 3 crystals</button>
+              </div>
+              <p id="hatchMessage" class="hatch-message hero-hatch-message">Who will you hatch next?</p>
             </div>
           </div>
         </div>
       </div>
     </header>
 
-    <main class="layout">
-      <section class="panel practice-panel">
-        <div class="panel-title-row">
-          <div>
-            <p class="section-kicker">Arena</p>
-            <h2>Train your dragon brain</h2>
-          </div>
-        </div>
+    <div class="tab-container">
+      <div class="tab-buttons">
+        <button class="tab-button active" data-tab="train">Training Arena</button>
+        <button class="tab-button" data-tab="collection">Beast Collection</button>
+      </div>
 
-
-        <div class="controls">
-          <label>
-            Topic
-            <select id="modeSelect">
-              <option value="addition">Addition</option>
-              <option value="subtraction">Subtraction</option>
-              <option value="multiplication">Times Tables</option>
-              <option value="division">Division</option>
-              <option value="mixed" selected>Mixed</option>
-            </select>
-          </label>
-
-          <label>
-            Difficulty
-            <select id="difficultySelect">
-              <option value="easy" selected>Easy</option>
-              <option value="medium">Medium</option>
-              <option value="hard">Hard</option>
-            </select>
-          </label>
-        </div>
-
-        <div class="question-card">
-          <p class="question-label">Current question</p>
-          <div id="questionText" class="question-text">Loading…</div>
-
-          <div class="answer-row">
-            <input id="answerInput" type="number" inputmode="numeric" placeholder="Type your answer" />
-            <button id="checkButton" class="primary-button">Check answer</button>
-          </div>
-
-          <div class="button-row">
-            <button id="newQuestionButton" class="secondary-button">New question</button>
-            <button id="resetButton" class="ghost-button">Reset progress</button>
-          </div>
-
-          <div id="feedbackBox" class="feedback info">Solve a sum to start collecting creatures.</div>
-        </div>
-
-        <div class="tip-box">
-          <h3>How rewards work</h3>
-          <ul>
-            <li>Each correct answer gives <strong>coins</strong>.</li>
-            <li>Every 5-answer streak gives a bonus <strong>crystal</strong>.</li>
-            <li>Use either currency to hatch a random creature.</li>
-          </ul>
-        </div>
-      </section>
-
-      <section class="panel hatchery-panel">
-        <div class="panel-title-row">
-          <div>
-            <p class="section-kicker">Dragon Hatchery</p>
-            <h2>Unlock a surprise friend</h2>
-          </div>
-        </div>
-
-        <div class="hatchery-box">
-          <div class="hatchery-spotlight">
-            <div class="spotlight-egg small">🐣</div>
-            <div>
-              <p class="spotlight-label">Mystery egg</p>
-              <p id="hatchMessage" class="hatch-message">Your starter dragon is waiting for friends.</p>
+      <main class="layout">
+        <!-- Training Tab -->
+        <div class="tab-panel active" id="train-panel">
+          <section class="panel practice-panel">
+            <div class="panel-title-row">
+              <div>
+                <p class="section-kicker">Arena</p>
+                <h2>Train your beast mind</h2>
+              </div>
             </div>
-          </div>
 
-          <p class="hatchery-text">Spend your rewards to hatch a surprise creature from your collection.</p>
+            <div class="controls">
+              <label>
+                Topic
+                <select id="modeSelect">
+                  <option value="addition">Addition</option>
+                  <option value="subtraction">Subtraction</option>
+                  <option value="multiplication">Times Tables</option>
+                  <option value="division">Division</option>
+                  <option value="mixed" selected>Mixed</option>
+                </select>
+              </label>
 
-          <div class="button-row hatch-buttons">
-            <button id="coinHatchButton" class="primary-button">Hatch for 20 coins</button>
-            <button id="crystalHatchButton" class="secondary-button">Hatch for 3 crystals</button>
-          </div>
+              <label>
+                Difficulty
+                <select id="difficultySelect">
+                  <option value="easy" selected>Easy</option>
+                  <option value="medium">Medium</option>
+                  <option value="hard">Hard</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="question-card">
+              <p class="question-label">Current question</p>
+              <div id="questionText" class="question-text">Loading…</div>
+
+              <div class="answer-row">
+                <input id="answerInput" type="number" inputmode="numeric" placeholder="Type your answer" />
+                <button id="checkButton" class="primary-button">Check answer</button>
+              </div>
+
+              <div class="button-row">
+                <button id="newQuestionButton" class="secondary-button">New question</button>
+               
+              </div>
+
+              <div id="feedbackBox" class="feedback info">Solve a sum to start collecting creatures.</div>
+            </div>
+
+            <div class="tip-box">
+              <h3>How rewards work</h3>
+              <ul>
+                <li>Each correct answer gives <strong>coins</strong>.</li>
+                <li>Every 5-answer streak gives a bonus <strong>crystal</strong>.</li>
+                <li>Use either currency to hatch a random beast.</li>
+              </ul>
+            </div>
+          </section>
         </div>
 
-        <h3 class="collection-heading">Creature Collection</h3>
-        <p class="collection-subtitle">Explore forest, water, sky, magic, and legendary dragons.</p>
-        <div id="collectionGrid" class="collection-grid"></div>
-      </section>
-    </main>
+        <!-- Collection Tab -->
+        <div class="tab-panel" id="collection-panel">
+          <section class="panel collection-panel">
+            <div class="panel-title-row">
+              <div>
+                <p class="section-kicker">Your Collection</p>
+                <h2>Hatched beasts</h2>
+              </div>
+            </div>
+
+            <div class="collection-controls">
+              <div class="search-box">
+                <input 
+                  type="text" 
+                  id="collectionSearch" 
+                  placeholder="Search beasts by name..." 
+                  class="search-input"
+                />
+              </div>
+              <div class="sort-box">
+                <label>
+                  Sort by
+                  <select id="collectionSort">
+                    <option value="theme">Theme</option>
+                    <option value="name">Name A-Z</option>
+                    <option value="rarity">Rarity</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+
+            <div id="collectionGrid" class="collection-grid"></div>
+            <div id="collectionEmpty" class="collection-empty">
+              <p>No beasts hatched yet! Return to the training arena to earn rewards.</p>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
   </div>
 
-  <script src="dragons.js"></script>
+  <script src="beasts.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
